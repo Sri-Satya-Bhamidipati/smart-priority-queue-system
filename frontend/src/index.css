@@ -1,0 +1,14 @@
+@tailwind base;@tailwind components;@tailwind utilities;
+body{@apply bg-bg text-ink antialiased font-sans}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes slide{from{transform:translateX(100%)}to{transform:none}}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+@keyframes flash{from{background:#E9DCCB}to{background:transparent}}
+.pop{animation:pop .25s ease-out}.slide{animation:slide .25s ease-out}.flash{animation:flash 1.2s ease-out}
+.skel{background:linear-gradient(90deg,#E9DCCB 0,#F3EADD 50%,#E9DCCB 100%);background-size:400px 100%;animation:shimmer 1.3s infinite linear;border-radius:12px}
+.btn{@apply rounded-lg px-4 py-2 text-sm font-semibold transition active:scale-95}
+.card{@apply bg-surface border border-line rounded-lg shadow-warm}
+.field{@apply w-full rounded-lg border border-line bg-bg px-3 py-2.5 text-sm outline-none focus:border-caramel focus:ring-2 focus:ring-caramel/20}
+
+.num{@apply font-sans tabular-nums}
+button:focus-visible,select:focus-visible,summary:focus-visible{@apply outline-2 outline-offset-2 outline-caramel}

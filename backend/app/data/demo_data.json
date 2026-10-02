@@ -1,0 +1,26 @@
+{
+  "HOSPITAL": [
+    {"customer_id": "H-101", "arrival_time": "2026-10-02T22:05:00Z", "urgency": "ROUTINE", "service_type": "PRESCRIPTION", "estimated_service_time": 4},
+    {"customer_id": "H-102", "arrival_time": "2026-10-02T22:10:00Z", "urgency": "EMERGENCY", "service_type": "EMERGENCY_CARE", "estimated_service_time": 15},
+    {"customer_id": "H-103", "arrival_time": "2026-10-02T22:12:00Z", "urgency": "URGENT", "service_type": "SPECIALIST_CONSULTATION", "estimated_service_time": 12},
+    {"customer_id": "H-104", "arrival_time": "2026-10-02T22:15:00Z", "urgency": "CRITICAL", "service_type": "SURGERY", "estimated_service_time": 30}
+  ],
+  "BANK": [
+    {"customer_id": "B-101", "arrival_time": "2026-10-02T22:05:00Z", "urgency": "NORMAL", "service_type": "CASH_WITHDRAWAL", "estimated_service_time": 5},
+    {"customer_id": "B-102", "arrival_time": "2026-10-02T22:10:00Z", "urgency": "HIGH", "service_type": "DOCUMENT_VERIFICATION", "estimated_service_time": 10},
+    {"customer_id": "B-103", "arrival_time": "2026-10-02T22:12:00Z", "urgency": "CRITICAL", "service_type": "FRAUD_REVIEW", "estimated_service_time": 20},
+    {"customer_id": "B-104", "arrival_time": "2026-10-02T22:15:00Z", "urgency": "LOW", "service_type": "BALANCE_INQUIRY", "estimated_service_time": 3}
+  ],
+  "GOVERNMENT": [
+    {"customer_id": "G-101", "arrival_time": "2026-10-02T22:05:00Z", "urgency": "LOW", "service_type": "FORM_SUBMISSION", "estimated_service_time": 5},
+    {"customer_id": "G-102", "arrival_time": "2026-10-02T22:10:00Z", "urgency": "HIGH", "service_type": "PASSPORT_APPLICATION", "estimated_service_time": 15},
+    {"customer_id": "G-103", "arrival_time": "2026-10-02T22:12:00Z", "urgency": "CRITICAL", "service_type": "LEGAL_CASE", "estimated_service_time": 25},
+    {"customer_id": "G-104", "arrival_time": "2026-10-02T22:15:00Z", "urgency": "NORMAL", "service_type": "CERTIFICATE_REQUEST", "estimated_service_time": 8}
+  ],
+  "COLLEGE": [
+    {"customer_id": "C-101", "arrival_time": "2026-10-02T22:05:00Z", "urgency": "NORMAL", "service_type": "COURSE_REGISTRATION", "estimated_service_time": 8},
+    {"customer_id": "C-102", "arrival_time": "2026-10-02T22:10:00Z", "urgency": "HIGH", "service_type": "DOCUMENT_VERIFICATION", "estimated_service_time": 12},
+    {"customer_id": "C-103", "arrival_time": "2026-10-02T22:12:00Z", "urgency": "CRITICAL", "service_type": "EXAM_ACCOMMODATION", "estimated_service_time": 20},
+    {"customer_id": "C-104", "arrival_time": "2026-10-02T22:15:00Z", "urgency": "LOW", "service_type": "ID_CARD", "estimated_service_time": 4}
+  ]
+}
