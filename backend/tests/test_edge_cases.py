@@ -68,6 +68,47 @@ def test_comparison_runs_all_algorithms_on_same_dataset():
 	assert all("average_turnaround_time" in item for item in results)
 
 
+def test_comparison_keeps_arrival_order_and_does_not_mutate_live_queue():
+	client.post("/api/queue/reset", params={"context": "BANK"})
+	arrival = "2026-10-03T00:00:00Z"
+	for customer_id, urgency, service_type, service_time in [
+		("first-low", "LOW", "BALANCE_INQUIRY", 5),
+		("second-critical", "CRITICAL", "FRAUD_REVIEW", 10),
+	]:
+		assert client.post("/api/queue/add", json={
+			"context": "BANK",
+			"customer_id": customer_id,
+			"arrival_time": arrival,
+			"urgency": urgency,
+			"service_type": service_type,
+			"estimated_service_time": service_time,
+		}).status_code == 200
+
+	queue_response = client.get("/api/queue", params={"context": "BANK"}).json()
+	assert queue_response["queue_length"] == 2
+	assert [item["customer_id"] for item in queue_response["queue"]] == [
+		"second-critical", "first-low"
+	]
+	assert [item["arrival_order"] for item in queue_response["queue"]] == [1, 0]
+	before_metrics = client.get("/api/queue/metrics", params={"context": "BANK"}).json()
+	comparison = client.post("/api/queue/compare", json={
+		"context": "BANK",
+		"customers": queue_response["queue"],
+	})
+	assert comparison.status_code == 200
+	results = comparison.json()["results"]
+	after_queue = client.get("/api/queue", params={"context": "BANK"}).json()
+	after_metrics = client.get("/api/queue/metrics", params={"context": "BANK"}).json()
+
+	assert results[0]["average_waiting_time"] < results[1]["average_waiting_time"]
+	assert after_queue["queue_length"] == queue_response["queue_length"] == 2
+	assert {item["customer_id"] for item in after_queue["queue"]} == {
+		"first-low", "second-critical"
+	}
+	assert after_metrics["queue_length"] == before_metrics["queue_length"] == 2
+	client.post("/api/queue/reset", params={"context": "BANK"})
+
+
 def test_batch_is_atomic_on_duplicate_id():
 	engine = QueueEngine("BANK")
 	input_time = datetime(2026, 10, 2, 22, 15, tzinfo=timezone.utc)

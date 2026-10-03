@@ -120,6 +120,30 @@ def test_priority_and_wait_refresh_as_time_passes():
 	assert customer.priority_score > earlier
 
 
+def test_queue_length_stays_constant_when_only_waiting_time_advances():
+	engine = QueueEngine("BANK")
+	for index in range(5):
+		add(engine, f"aging-{index}", urgency="LOW", age=index)
+
+	before = engine.get_metrics(NOW)
+	before_priorities = {
+		customer.customer_id: customer.priority_score
+		for customer in engine.get_queue(NOW)
+	}
+	later = NOW + timedelta(minutes=15)
+	engine.update_waiting_times(later)
+	after = engine.get_metrics(later)
+	after_priorities = {
+		customer.customer_id: customer.priority_score
+		for customer in engine.get_queue(later)
+	}
+
+	assert before["queue_length"] == before["customers_waiting"] == 5
+	assert after["queue_length"] == after["customers_waiting"] == 5
+	assert len(engine.get_queue(later)) == 5
+	assert before_priorities != after_priorities
+
+
 def test_invalid_context_rejected():
 	with pytest.raises(ValueError, match="Invalid context"):
 		QueueEngine("AIRPORT")

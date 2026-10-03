@@ -29,5 +29,10 @@ class BatchCustomersRequest(BaseModel):
 	customers: list[CustomerInput]
 
 
-class ComparisonRequest(BatchCustomersRequest):
-	pass
+class ComparisonCustomerInput(CustomerInput):
+	arrival_order: int | None = Field(default=None, ge=0)
+
+
+class ComparisonRequest(BaseModel):
+	context: str = "BANK"
+	customers: list[ComparisonCustomerInput]

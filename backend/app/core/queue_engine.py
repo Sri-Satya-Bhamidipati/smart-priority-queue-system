@@ -31,9 +31,9 @@ class Customer:
 	def current_wait_minutes(self, now: datetime) -> float:
 		return waiting_time_minutes(self.arrival_time, now)
 
-	def as_dict(self, now: datetime) -> dict[str, Any]:
+	def as_dict(self, now: datetime, *, include_arrival_order: bool = False) -> dict[str, Any]:
 		wait = self.current_wait_minutes(now) if self.status == "WAITING" else self.waiting_time
-		return {
+		data: dict[str, Any] = {
 			"customer_id": self.customer_id,
 			"arrival_time": self.arrival_time.isoformat(),
 			"priority_score": self.priority_score,
@@ -43,6 +43,9 @@ class Customer:
 			"service_type": self.service_type,
 			"estimated_service_time": self.estimated_service_time,
 		}
+		if include_arrival_order:
+			data["arrival_order"] = self._sequence
+		return data
 
 
 class QueueEngine:

@@ -26,12 +26,12 @@ All queue endpoints accept a `context` query parameter where applicable; it defa
 | GET | `/api/contexts` | Context urgency and service score configuration |
 | POST | `/api/queue/add` | Add one customer; body includes `context` and customer fields |
 | POST | `/api/queue/batch` | Add customers atomically; body is `{ "context": "BANK", "customers": [...] }` |
-| GET | `/api/queue?context=BANK` | Get ordered waiting customers and queue length |
+| GET | `/api/queue?context=BANK` | Get priority-ordered waiting customers, insertion order for comparison tie-breaking, and queue length |
 | GET | `/api/queue/next?context=BANK` | Peek at the next customer without serving |
 | POST | `/api/queue/serve?context=BANK` | Remove and mark the next customer served |
 | GET | `/api/queue/metrics?context=BANK` | Return wait, service, throughput, and queue metrics |
 | POST | `/api/queue/reset?context=BANK` | Clear one context's queue and service history |
-| POST | `/api/queue/compare` | Simulate FCFS, static priority, and dynamic priority on the same input dataset |
+| POST | `/api/queue/compare` | Simulate FCFS, static priority, and dynamic priority on the same input dataset; optional `arrival_order` values preserve queue insertion order when arrival timestamps tie |
 
 Customer bodies use ISO 8601 `arrival_time`, a positive integer `estimated_service_time` in minutes, and context-specific urgency/service names. Invalid inputs and duplicate IDs return HTTP 422 with a descriptive error. CORS allows the Vite development origins on ports 5173 and 4173.
 

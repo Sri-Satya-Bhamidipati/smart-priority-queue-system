@@ -68,7 +68,7 @@ def get_queue(context: str = Query(default="BANK")) -> dict[str, Any]:
 	customers = engine.get_queue(now)
 	return {
 		"context": engine.context.value,
-		"queue": [_customer_data(item, now) for item in customers],
+		"queue": [item.as_dict(now, include_arrival_order=True) for item in customers],
 		"queue_length": len(customers),
 	}
 
@@ -106,7 +106,10 @@ def compare(request: ComparisonRequest) -> dict[str, Any]:
 	try:
 		customers = [customer.model_dump() for customer in request.customers]
 		for customer in customers:
-			validate_customer_fields(**customer, context=engine.context)
+			validate_customer_fields(
+				**{key: value for key, value in customer.items() if key != "arrival_order"},
+				context=engine.context,
+			)
 		results = compare_algorithms(engine.context, customers)
 	except ValueError as exc:
 		raise HTTPException(status_code=422, detail=str(exc)) from exc

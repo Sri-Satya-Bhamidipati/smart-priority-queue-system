@@ -16,7 +16,17 @@ def _timestamp(value: datetime) -> float:
 def _simulate(context: ContextName | str, customers: list[dict[str, Any]], algorithm: str) -> dict[str, float | int | str]:
     context_name = ContextName(context)
     config = get_context_config(context_name)
-    records = [dict(customer, sequence=index) for index, customer in enumerate(customers)]
+    records: list[dict[str, Any]] = []
+    for index, customer in enumerate(customers):
+        record = dict(customer)
+        if isinstance(record["arrival_time"], str):
+            record["arrival_time"] = datetime.fromisoformat(
+                record["arrival_time"].replace("Z", "+00:00")
+            )
+        if record.get("arrival_order") is None:
+            record["arrival_order"] = index
+        record["sequence"] = index
+        records.append(record)
     if not records:
         return {
             "algorithm": algorithm,
@@ -37,23 +47,43 @@ def _simulate(context: ContextName | str, customers: list[dict[str, Any]], algor
             available = [record for record in remaining if _timestamp(record["arrival_time"]) <= clock]
 
         if algorithm == "FCFS":
-            selected = min(available, key=lambda record: (_timestamp(record["arrival_time"]), record["sequence"]))
+            selected = min(
+                available,
+                key=lambda record: (
+                    _timestamp(record["arrival_time"]),
+                    record["arrival_order"],
+                    record["sequence"],
+                ),
+            )
         elif algorithm == "STATIC_PRIORITY":
-            def static_key(record: dict[str, Any]) -> tuple[float, float, int]:
+            def static_key(record: dict[str, Any]) -> tuple[float, float, int, int]:
                 urgency = config.urgency_scores[record["urgency"].upper()]
                 service = config.service_scores[record["service_type"].upper()]
-                return (0.5 * urgency + 0.2 * service, -_timestamp(record["arrival_time"]), -record["sequence"])
+                return (
+                    0.5 * urgency + 0.2 * service,
+                    -_timestamp(record["arrival_time"]),
+                    -record["arrival_order"],
+                    -record["sequence"],
+                )
 
             selected = max(available, key=static_key)
         else:
-            heap: MaxHeap[tuple[tuple[float, float, float, int], dict[str, Any]]] = MaxHeap(key=lambda item: item[0])
+            heap: MaxHeap[
+                tuple[tuple[float, float, float, int, int], dict[str, Any]]
+            ] = MaxHeap(key=lambda item: item[0])
             current_time = datetime.fromtimestamp(clock, tz=timezone.utc)
             for record in available:
                 waiting = waiting_time_minutes(record["arrival_time"], current_time)
                 score = calculate_priority(
                     context_name, record["urgency"], record["service_type"], waiting
                 )
-                tie_key = (score, waiting, -_timestamp(record["arrival_time"]), -record["sequence"])
+                tie_key = (
+                    score,
+                    waiting,
+                    -_timestamp(record["arrival_time"]),
+                    -record["arrival_order"],
+                    -record["sequence"],
+                )
                 heap.push((tie_key, record))
             selected = heap.pop_max()[1]
 
